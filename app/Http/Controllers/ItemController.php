@@ -41,8 +41,8 @@ class ItemController extends Controller
             $request->validated();
 
             $filename = null;
-            if ($request->hasFile('photo')) {
-                $file = $request->file('photo');
+            if ($request->hasFile('image')) {
+                $file = $request->file('image');
                 $filename = $request->name . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('assets/images/'), $filename);
             }
@@ -52,10 +52,12 @@ class ItemController extends Controller
                 'description' => $request->description,
                 'category_id' => $request->category_id,
                 'province_id' => $request->province_id,
-                'photo' => $filename,
+                'image' => $filename,
             ]);
 
             DB::commit();
+
+            return redirect()->route('dashboard.index');
         } catch (\Exception $e) {
             DB::rollback();
             // handle the exception here, maybe return with an error message
@@ -92,9 +94,15 @@ class ItemController extends Controller
         try {
             $request->validated();
 
-            $filename = null;
-            if ($request->hasFile('photo')) {
-                $file = $request->file('photo');
+            $filename = $item->image; // Default to existing image filename
+            if ($request->hasFile('image')) {
+                // Hapus gambar lama jika ada
+                if ($item->image && file_exists(public_path('assets/images/' . $item->image))) {
+                    unlink(public_path('assets/images/' . $item->image));
+                }
+
+                // Simpan gambar baru
+                $file = $request->file('image');
                 $filename = $request->name . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('assets/images/'), $filename);
             }
@@ -104,7 +112,7 @@ class ItemController extends Controller
                 'description' => $request->description,
                 'category_id' => $request->category_id,
                 'province_id' => $request->province_id,
-                'photo' => $filename,
+                'image' => $filename,
             ]);
 
             DB::commit();
@@ -112,7 +120,8 @@ class ItemController extends Controller
             return redirect()->route('dashboard.index');
         } catch (\Exception $e) {
             DB::rollback();
-            // handle the exception here, maybe return with an error message
+            // Tangani pengecualian di sini, mungkin mengembalikan dengan pesan error
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
     }
 

@@ -47,8 +47,8 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="photo">Photo</label>
-                <input type="file" class="form-control-file" id="photo" name="photo" required>
+                <label for="image">Photo</label>
+                <input type="file" class="form-control-file" id="image" name="image" required>
             </div>
             <div class="form-group">
                 <label for="province_id">Province</label>
